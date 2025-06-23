@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field, field_validator
 from masumi.config import Config
 from masumi.payment import Payment, Amount
 from crew_definition import ResearchCrew
+from linkedin_searcher_definition import LinkedinCrew
+from validator_definition import ValidatorCrew
 from logging_config import setup_logging
 from typing import Generator
 import botocore
@@ -79,14 +81,26 @@ async def execute_crew_task(query: str) -> str:
     """ Execute a CrewAI task with Research and Writing Agents using data from a CSV file """
     logger.info(f"Starting CrewAI task with query: {query}")
 
-    crew = ResearchCrew(logger=logger)
+    researcher = ResearchCrew(logger=logger)
+    validator = ValidatorCrew(logger=logger)
+    linkedin = LinkedinCrew(logger=logger)
     date = datetime.now().strftime("%Y%m%d_%H%M%S")
-    result = crew.crew.kickoff(inputs={"text": query})["result"]
+    result = researcher.crew.kickoff(inputs={"text": query})["result"]
+
+    names =[]
+    linkedin = []
+    
+    for url in result:
+        names.append( validator.crew.kickoff(inputs={"text":url})["result"])
+    for name in names:
+        linkedin.append(linkedin.crew.kickoff(inputs={"text":name}["result"]))
+
 
     # If result is a CSV string, save it directly
     filename = f"{query}_company_list_{date}.csv"
     with open(filename, "w", encoding="utf-8") as f:
-        f.write(result)
+        for url in linkedin:
+            f.write(f"- {url}\n")
 
     # Upload to S3/Spaces
     session = boto3.session.Session()
