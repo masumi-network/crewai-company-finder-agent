@@ -2,24 +2,25 @@ from crewai.tools import BaseTool
 from dotenv import load_dotenv
 import http.client
 import json
+import os
 
 load_dotenv()
 
-class LinkedinSearch(BaseTool):
+class CrunchbaseSearch(BaseTool):
     name: str = "contact finder"
     description: str = "Search the the prompt for a list of companies"
 
-    def _run(self, domain: str) -> list[dict]:
+    def _run(self, domain: str,canonical:str,prompt:str) -> list[dict]:
 
         conn = http.client.HTTPSConnection("google.serper.dev")
 
       
         payload = json.dumps({
-        "q": f"{domain} site:linkedin.com",
-        "num": 1})
+        "q": f"{domain} {canonical} {prompt} \"contact\" \"email\" site:crunchbase.com",
+        "num": 10})
 
         headers = {
-        'X-API-KEY': '957d5b2a0d43ede679fda0c75794b2acbf707f31',
+        'X-API-KEY': os.getenv("SERPER_API_KEY"),
         'Content-Type': 'application/json'
         }
         conn.request("POST", "/search", payload, headers)
@@ -28,9 +29,9 @@ class LinkedinSearch(BaseTool):
 
 
         result = json.loads(data.decode("utf-8"))
-        links = [item['link'] for item in result.get("organic", [])]
+        snippets = [item.get("snippet", "") for item in result.get("organic", [])]
 
-        return links
+        return snippets
 
         """
         tool = SerperDevTool(

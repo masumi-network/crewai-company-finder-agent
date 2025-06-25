@@ -8,8 +8,9 @@ from pydantic import BaseModel, Field, field_validator
 from masumi.config import Config
 from masumi.payment import Payment, Amount
 from crew_definition import ResearchCrew
-from linkedin_searcher_definition import LinkedinCrew
+from crunchbase_definition import CrunchbaseCrew
 from validator_definition import ValidatorCrew
+from contact_definition import ContactCrew
 from logging_config import setup_logging
 from typing import Generator
 import botocore
@@ -83,24 +84,47 @@ async def execute_crew_task(query: str) -> str:
 
     researcher = ResearchCrew(logger=logger)
     validator = ValidatorCrew(logger=logger)
-    linkedin = LinkedinCrew(logger=logger)
+    crunchbase = CrunchbaseCrew(logger=logger)
+    contact_finder = ContactCrew(logger=logger)
     date = datetime.now().strftime("%Y%m%d_%H%M%S")
-    result = researcher.crew.kickoff(inputs={"text": query})["result"]
+    links = researcher.crew.kickoff(inputs={"text": query})
+    result = links["result"]
+    prompt = links["prompt"]
 
     names =[]
-    linkedin = []
-    
+    urls = []
+    emails = []
+    canonical = []
+
+
     for url in result:
-        names.append( validator.crew.kickoff(inputs={"text":url})["result"])
-    for name in names:
-        linkedin.append(linkedin.crew.kickoff(inputs={"text":name}["result"]))
+        output = validator.crew.kickoff(inputs={"text":url})
+        names.append(output["result"])
+        emails.append(output["email"])
+        if 'www.' in output["canonical"] and url != output["canonical"][:-1]:
+            canonical.append(output["canonical"])
+        else:
+            canonical.append("")
+        urls.append(url)
+        
+    for i in range(len(result)):
+        if "@" not in emails[i]:
+            crunchbase_contact = crunchbase.crew.kickoff(inputs={"text":result[i],"canonical":canonical[i],"prompt":prompt,"email":emails[i]})
+            emails[i] = crunchbase_contact["result"]
+            result[i] = canonical[i]
 
+    for i in range(len(result)):
+        if "@" not in emails[i]:
+            contact_url = contact_finder.crew.kickoff(inputs={"text":result[i]})
+            emails[i] = contact_url["contact"]
 
+    
     # If result is a CSV string, save it directly
     filename = f"{query}_company_list_{date}.csv"
     with open(filename, "w", encoding="utf-8") as f:
-        for url in linkedin:
-            f.write(f"- {url}\n")
+        for url, email in zip(urls, emails):
+            f.write(f"{url} - {email}\n")
+
 
     # Upload to S3/Spaces
     session = boto3.session.Session()

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from crewai_tools import SerperDevTool
 import http.client
 import json
+import os
 
 load_dotenv()
 
@@ -20,10 +21,11 @@ class Scraper(BaseTool):
                 domains += " OR "
         payload = json.dumps({
         "q": f"{url} (\"About Us\" OR \"Our Company\") site:*{domains} -site:forbes.com -site:nytimes.com -site:mckinsey.com -site:cnn.com -site:medium.com -site:linkedin.com -site:twitter.com -site:facebook.com -site:youtube.com -site:reddit.com -site:quora.com -inurl:blog -inurl:blogs -inurl:article -inurl:insights",
-        "num": 10})
+        "gl": country,
+        "num": 100})
 
         headers = {
-        'X-API-KEY': '957d5b2a0d43ede679fda0c75794b2acbf707f31',
+        'X-API-KEY': os.getenv("SERPER_API_KEY"),
         'Content-Type': 'application/json'
         }
         conn.request("POST", "/search", payload, headers)
