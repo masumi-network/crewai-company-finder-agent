@@ -10,7 +10,7 @@ class Scraper(BaseTool):
     name: str = "contact finder"
     description: str = "Search the the prompt for a list of companies"
 
-    def _run(self, url: str,country: str,domain_list:list) -> list[dict]:
+    def _run(self, url: str,country: str,domain_list:list,after:str,before:str) -> list[dict]:
 
         conn = http.client.HTTPSConnection("google.serper.dev")
         domains = ""
@@ -19,7 +19,7 @@ class Scraper(BaseTool):
             if domain != domain_list[-1]:
                 domains += " OR "
         payload = json.dumps({
-        "q": f"{url} (\"About Us\" OR \"Our Company\") site:*{domains} -site:forbes.com -site:nytimes.com -site:mckinsey.com -site:cnn.com -site:medium.com -site:linkedin.com -site:twitter.com -site:facebook.com -site:youtube.com -site:reddit.com -site:quora.com -inurl:blog -inurl:blogs -inurl:article -inurl:insights",
+        "q": f"{url} (\"About Us\" OR \"Our Company\") site:*{domains} -site:forbes.com -site:nytimes.com -site:mckinsey.com -site:cnn.com -site:medium.com -site:linkedin.com -site:twitter.com -site:facebook.com -site:youtube.com -site:reddit.com -site:quora.com -inurl:blog -inurl:blogs -inurl:article -inurl:insights after:{after} before:{before}",
         "gl": country,
         "num": 100})
 

@@ -26,7 +26,7 @@ class ContactCrew():
 
         emailScraper = Agent(
             role='Contact Page Email Scraper',
-            goal='Given a contact page URL, scrape it and return a contact email address if found. if not, return the url of the contact page instead',
+            goal='Given a contact page URL, scrape it and return a the best suiting contact email address if found. if not, return the url of the contact page instead',
             backstory='Expert at scraping web pages and extracting email addresses.',
             verbose=self.verbose
         )
@@ -43,7 +43,7 @@ class ContactCrew():
 
         # Task 2: Scrape contact page for email
         scrape_email_task = Task(
-            description="""from a given context,use the web scraper tool to extract and return the first email address found on the page. If no email is found, return an the page url.""",
+            description="""from a given context,use the web scraper tool to extract and return the best suting email address found on the page. If no email is found, return an the page url.""",
             expected_output="""The email address found on the contact page, or the contact page url if none found.""",
             agent=emailScraper,
             tools=[WebScraper()],
