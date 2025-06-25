@@ -1,10 +1,7 @@
 from crewai import Agent, Crew, Task
 from logging_config import get_logger
 import pandas as pd
-from typing import Generator, Type
-from crewai_tools import ScrapeWebsiteTool
 from pydantic import BaseModel
-from scrapflyscraper import WebScraper
 from scrapertool import Scraper
 
 

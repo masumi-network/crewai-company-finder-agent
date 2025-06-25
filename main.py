@@ -4,7 +4,7 @@ import uuid
 import pandas as pd
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query, HTTPException
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel
 from masumi.config import Config
 from masumi.payment import Payment, Amount
 from crew_definition import ResearchCrew
@@ -12,7 +12,6 @@ from crunchbase_definition import CrunchbaseCrew
 from validator_definition import ValidatorCrew
 from contact_definition import ContactCrew
 from logging_config import setup_logging
-from typing import Generator
 import botocore
 import boto3
 import uuid
@@ -155,11 +154,6 @@ async def execute_crew_task(query: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 1) Start Job (MIP-003: /start_job)
 # ─────────────────────────────────────────────────────────────────────────────
-
-@app.post("/force_run")
-async def force_run(data:StartJobRequest):
-    result = await execute_crew_task(data.input_data.get("text")) 
-    return result
 
 @app.post("/start_job")
 async def start_job(data: StartJobRequest):

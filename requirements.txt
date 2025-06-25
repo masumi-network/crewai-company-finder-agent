@@ -8,3 +8,5 @@ python-multipart
 httpx
 requests
 beautifulsoup4
+boto3
+botocore

@@ -1,6 +1,5 @@
 from crewai.tools import BaseTool
 from dotenv import load_dotenv
-from crewai_tools import SerperDevTool
 import http.client
 import json
 import os
