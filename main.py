@@ -1,7 +1,6 @@
 import os
 import uvicorn
 import uuid
-import pandas as pd
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
