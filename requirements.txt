@@ -10,3 +10,4 @@ requests
 beautifulsoup4
 boto3
 botocore
+crewai[tools]
