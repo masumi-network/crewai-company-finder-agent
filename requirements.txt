@@ -2,7 +2,7 @@ fastapi
 uvicorn
 python-dotenv
 crewai
-masumi==0.1.36
+masumi_crewai
 pydantic
 python-multipart
 httpx

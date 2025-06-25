@@ -4,8 +4,8 @@ import uuid
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
-from masumi.config import Config
-from masumi.payment import Payment, Amount
+from masumi_crewai.config import Config
+from masumi_crewai.payment import Payment, Amount
 from crew_definition import ResearchCrew
 from crunchbase_definition import CrunchbaseCrew
 from validator_definition import ValidatorCrew
